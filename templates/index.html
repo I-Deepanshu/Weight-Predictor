@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Height to Weight Predictor</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        input[type="number"] {
+            width: 80%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Height to Weight Predictor</h1>
+        <input type="number" id="height" placeholder="Enter height in inches" />
+        <button onclick="predictWeight()">Predict Weight</button>
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        async function predictWeight() {
+            const height = document.getElementById('height').value;
+            const resultDiv = document.getElementById('result');
+
+            // Clear any previous result
+            resultDiv.innerHTML = '';
+
+            if (!height) {
+                resultDiv.innerHTML = 'Please enter a height.';
+                resultDiv.classList.add('error');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ height: parseFloat(height) })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.innerHTML = `Predicted Weight: ${data.predicted_weight.toFixed(2)} Pounds`;
+                    resultDiv.classList.remove('error');
+                } else {
+                    resultDiv.innerHTML = `Error: ${data.error || 'Something went wrong.'}`;
+                    resultDiv.classList.add('error');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = 'Error: Failed to connect to the API.';
+                resultDiv.classList.add('error');
+            }
+        }
+    </script>
+</body>
+</html>
