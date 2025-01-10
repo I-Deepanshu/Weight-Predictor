@@ -18,13 +18,17 @@ def predict():
     try:
         # Get the input data from the request
         data = request.get_json()
-        height = data.get('height')
+
+        # Extract height from the received JSON data
+        height = data.get('height', None)
 
         if height is None:
             return jsonify({'error': 'Height is required'}), 400
 
-        # Predict weight using the model
+        # Make the prediction using the model
         prediction = model.predict(np.array([[height]]))
+
+        # Return the predicted weight as a response
         return jsonify({'predicted_weight': prediction[0]})
 
     except Exception as e:
